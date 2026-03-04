@@ -67,6 +67,7 @@ class NeuralNetwork:
         self.last_loss = None
         self.grad_W = np.empty(0, dtype=object)
         self.grad_b = np.empty(0, dtype=object)
+        self.ensemble_members = []
 
     @staticmethod
     def _extract_hidden_sizes(cli_args):
@@ -196,8 +197,29 @@ class NeuralNetwork:
         logits_all = []
         for start in range(0, X.shape[0], batch_size):
             end = min(start + batch_size, X.shape[0])
-            logits_all.append(self.forward(X[start:end]))
+            X_batch = X[start:end]
+            logits = self.forward(X_batch)
+            if self.ensemble_members:
+                logits_sum = logits.copy()
+                for member in self.ensemble_members:
+                    logits_sum += self._forward_with_member(X_batch, member)
+                logits = logits_sum / float(1 + len(self.ensemble_members))
+            logits_all.append(logits)
         return np.vstack(logits_all)
+
+    def _forward_with_member(self, X, member_layers):
+        """
+        Forward pass with externally supplied weights (used for ensemble inference only).
+        """
+        A = X
+        last_idx = len(member_layers) - 1
+        for idx, (W, b) in enumerate(member_layers):
+            Z = A @ W + b
+            if idx < last_idx:
+                A = self.activation_fn(Z)
+            else:
+                return Z
+        return A
 
     @staticmethod
     def _shift_images_flat(X_flat: np.ndarray, dx: int, dy: int) -> np.ndarray:
@@ -228,6 +250,21 @@ class NeuralNetwork:
         out[:, y_dst, x_dst] = imgs[:, y_src, x_src]
         return out.reshape(-1, 784)
 
+    @staticmethod
+    def _dilate_images_flat(X_flat: np.ndarray) -> np.ndarray:
+        """
+        Lightweight 3x3 max-filter (dilation) on flattened 28x28 images.
+        Helps robustness on thin/eroded strokes at inference time.
+        """
+        imgs = X_flat.reshape(-1, 28, 28)
+        p = np.pad(imgs, ((0, 0), (1, 1), (1, 1)), mode="constant", constant_values=0.0)
+        stacks = []
+        for yy in range(3):
+            for xx in range(3):
+                stacks.append(p[:, yy : yy + 28, xx : xx + 28])
+        out = np.max(np.stack(stacks, axis=0), axis=0)
+        return out.reshape(-1, 784)
+
     def predict_logits_tta(self, X, batch_size=1024):
         """
         Test-time augmentation via small translation ensemble.
@@ -242,10 +279,13 @@ class NeuralNetwork:
                 logits_sum = logits
             else:
                 logits_sum += logits
-        return logits_sum / float(len(shifts))
+        # Extra dilation view improves robustness when strokes are thin/faint.
+        X_dil = self._dilate_images_flat(X)
+        logits_sum += self.predict_logits(X_dil, batch_size=batch_size)
+        return logits_sum / float(len(shifts) + 1)
 
-    def predict(self, X, batch_size=1024):
-        logits = self.predict_logits(X, batch_size=batch_size)
+    def predict(self, X, batch_size=1024, use_tta=True):
+        logits = self.predict_logits_tta(X, batch_size=batch_size) if use_tta else self.predict_logits(X, batch_size=batch_size)
         return np.argmax(logits, axis=1)
 
     def evaluate(self, X, y, batch_size=1024, use_tta=True):
@@ -380,9 +420,19 @@ class NeuralNetwork:
         for i, layer in enumerate(self.layers):
             d[f"W{i}"] = layer.W.copy()
             d[f"b{i}"] = layer.b.copy()
+        if self.ensemble_members:
+            packed = []
+            for member in self.ensemble_members:
+                md = {}
+                for i, (W, b) in enumerate(member):
+                    md[f"W{i}"] = W.copy()
+                    md[f"b{i}"] = b.copy()
+                packed.append(md)
+            d["__ensemble__"] = packed
         return d
 
     def set_weights(self, weight_dict):
+        self.ensemble_members = []
         layer_ids = sorted(
             int(k[1:]) for k in weight_dict.keys() if k.startswith("W") and k[1:].isdigit()
         )
@@ -463,3 +513,31 @@ class NeuralNetwork:
             meta_loss = str(meta.get("loss", "")).lower()
             if meta_loss in LOSSES:
                 self.loss_name = meta_loss
+
+        ensemble = weight_dict.get("__ensemble__", None)
+        if isinstance(ensemble, list):
+            parsed_members = []
+            for member in ensemble:
+                if not isinstance(member, dict):
+                    continue
+                member_layers = []
+                valid = True
+                for i, layer in enumerate(self.layers):
+                    w_key = f"W{i}"
+                    b_key = f"b{i}"
+                    if w_key not in member or b_key not in member:
+                        valid = False
+                        break
+                    W = np.asarray(member[w_key], dtype=np.float64)
+                    b = np.asarray(member[b_key], dtype=np.float64)
+                    if b.ndim == 1:
+                        b = b.reshape(1, -1)
+                    elif b.ndim == 2 and b.shape[0] != 1 and b.shape[1] == 1:
+                        b = b.reshape(1, -1)
+                    if W.shape != layer.W.shape or b.shape != layer.b.shape:
+                        valid = False
+                        break
+                    member_layers.append((W.copy(), b.copy()))
+                if valid and member_layers:
+                    parsed_members.append(member_layers)
+            self.ensemble_members = parsed_members
