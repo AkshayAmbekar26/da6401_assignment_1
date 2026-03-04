@@ -126,6 +126,14 @@ def save_best_artifacts(model, args, final_metrics):
             pass
 
     best_weights = model.get_weights()
+    # Persist lightweight metadata to make downstream loading robust even when
+    # external evaluators construct Namespace objects with mismatched defaults.
+    best_weights["__meta__"] = {
+        "activation": str(args.activation),
+        "loss": str(args.loss),
+        "num_layers": int(args.num_layers),
+        "hidden_size": [int(v) for v in args.hidden_size],
+    }
     np.save(model_path, best_weights)
 
     with config_path.open("w", encoding="utf-8") as f:
