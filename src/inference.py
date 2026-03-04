@@ -38,11 +38,11 @@ def load_model(model_path):
     return data
 
 
-def evaluate_model(model, X_test, y_test, batch_size): 
+def evaluate_model(model, X_test, y_test, batch_size):
     """
     Evaluate model on test data.
     """
-    metrics = model.evaluate(X_test, y_test, batch_size=batch_size)
+    metrics = model.evaluate(X_test, y_test, batch_size=batch_size, use_tta=True)
     return {
         "logits": metrics["logits"],
         "loss": metrics["loss"],

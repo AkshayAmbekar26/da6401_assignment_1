@@ -4,7 +4,7 @@
   "batch_size": 64,
   "loss": "cross_entropy",
   "optimizer": "rmsprop",
-  "learning_rate": 0.0005,
+  "learning_rate": 0.0004,
   "weight_decay": 0.0001,
   "num_layers": 4,
   "hidden_size": [
@@ -18,26 +18,26 @@
   "seed": 42,
   "wandb_project": "da6401_assignment_1",
   "saved_model_path": "src/best_model.npy",
-  "saved_at": "2026-03-04T00:00:00+00:00",
+  "saved_at": "2026-03-04T17:05:33.712086+00:00",
   "metrics": {
     "val": {
-      "accuracy": 0.9755,
-      "f1": 0.9754881165092686
+      "accuracy": 0.9859,
+      "f1": 0.9857269645805226
     },
     "test": {
-      "accuracy": 0.9795,
-      "f1": 0.9793044554604498
+      "accuracy": 0.9859,
+      "f1": 0.985738890420019
     }
   },
   "selection": {
-    "policy": "private_robust_search_v2",
-    "source": "src/tmp/private_robust_search_results_v2.json",
-    "candidate_name": "ft_v2_inv20_rot35_blur15",
+    "policy": "private_robust_search_v4",
+    "source": "src/tmp/private_robust_search_results_v4.json",
+    "candidate_name": "ft_v4_rot25_balanced",
     "summary": {
-      "clean_f1": 0.9793044554604498,
-      "mean_f1": 0.9565707740515229,
-      "min_f1": 0.9174156529567284,
-      "robust_score": 0.9582465620581152
+      "clean_f1": 0.985738890420019,
+      "mean_f1": 0.9394111122511941,
+      "min_f1": 0.7021966192021584,
+      "robust_score": 0.8994107298926121
     }
   }
 }
