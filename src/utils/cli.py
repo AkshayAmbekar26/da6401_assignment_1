@@ -9,7 +9,7 @@ import argparse
 
 def add_common_arguments(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
     parser.add_argument("-d", "-dataset", "--dataset", default="mnist", choices=["mnist", "fashion_mnist"])
-    parser.add_argument("-e", "-epochs", "--epochs", type=int, default=25)
+    parser.add_argument("-e", "-epochs", "--epochs", type=int, default=20)
     parser.add_argument("-b", "-batch_size", "--batch_size", type=int, default=64)
     parser.add_argument(
         "-l",
@@ -20,11 +20,11 @@ def add_common_arguments(parser: argparse.ArgumentParser) -> argparse.ArgumentPa
     )
     parser.add_argument("-o", "-optimizer", "--optimizer", default="rmsprop", choices=["sgd", "momentum", "nag", "rmsprop"])
     parser.add_argument("-lr", "-learning_rate", "--learning_rate", type=float, default=5e-4)
-    parser.add_argument("-wd", "--weight_decay", type=float, default=0.0)
-    parser.add_argument("-nhl", "--num_layers", type=int, default=2)
-    parser.add_argument("-sz", "--hidden_size", nargs="+", type=int, default=[128, 128])
-    parser.add_argument("-a", "--activation", default="tanh", choices=["sigmoid", "tanh", "relu"])
-    parser.add_argument("-w_i", "--weight_init", default="random", choices=["random", "xavier", "zeros"])
+    parser.add_argument("-wd", "--weight_decay", type=float, default=1e-4)
+    parser.add_argument("-nhl", "--num_layers", type=int, default=4)
+    parser.add_argument("-sz", "--hidden_size", nargs="+", type=int, default=[128, 128, 128, 128])
+    parser.add_argument("-a", "--activation", default="relu", choices=["sigmoid", "tanh", "relu"])
+    parser.add_argument("-w_i", "--weight_init", default="xavier", choices=["random", "xavier", "zeros"])
     parser.add_argument("-w_p", "--wandb_project", default="da6401_assignment_1")
     parser.add_argument("--wandb_entity", default=None)
     parser.add_argument("--wandb_mode", default="online", choices=["online", "offline", "disabled"])
