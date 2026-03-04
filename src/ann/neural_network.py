@@ -22,15 +22,18 @@ class NeuralNetwork:
         self.args = cli_args
         self.input_dim = 28 * 28
         self.output_dim = 10
-        self.activation_name = cli_args.activation.lower()
-        self.loss_name = cli_args.loss.lower()
-        self.learning_rate = float(cli_args.learning_rate)
-        self.weight_decay = float(cli_args.weight_decay)
-        self.optimizer_name = cli_args.optimizer.lower()
-        self.weight_init = cli_args.weight_init.lower()
-        self.num_layers = int(cli_args.num_layers)
-        self.hidden_sizes = self._resolve_hidden_sizes(cli_args.hidden_size, self.num_layers)
-        self.seed = int(cli_args.seed)
+        self.activation_name = str(getattr(cli_args, "activation", "relu")).lower()
+        self.loss_name = str(getattr(cli_args, "loss", "cross_entropy")).lower()
+        self.learning_rate = float(getattr(cli_args, "learning_rate", 1e-3))
+        self.weight_decay = float(getattr(cli_args, "weight_decay", 0.0))
+        self.optimizer_name = str(getattr(cli_args, "optimizer", "sgd")).lower()
+        self.weight_init = str(getattr(cli_args, "weight_init", "xavier")).lower()
+
+        hidden_size_arg = self._extract_hidden_sizes(cli_args)
+        num_layers_arg = self._extract_num_layers(cli_args, hidden_size_arg)
+        self.num_layers = int(num_layers_arg)
+        self.hidden_sizes = self._resolve_hidden_sizes(hidden_size_arg, self.num_layers)
+        self.seed = int(getattr(cli_args, "seed", 42))
         self.rng = np.random.default_rng(self.seed)
 
         if self.activation_name not in ACTIVATIONS:
@@ -65,8 +68,39 @@ class NeuralNetwork:
         self.grad_b = np.empty(0, dtype=object)
 
     @staticmethod
+    def _extract_hidden_sizes(cli_args):
+        hidden = getattr(cli_args, "hidden_size", None)
+        if hidden is None:
+            hidden = getattr(cli_args, "hidden_sizes", None)
+        if hidden is None:
+            return [128]
+
+        if isinstance(hidden, np.ndarray):
+            hidden = hidden.tolist()
+        if isinstance(hidden, (int, float)):
+            return [int(hidden)]
+        if isinstance(hidden, tuple):
+            hidden = list(hidden)
+        if isinstance(hidden, list):
+            return [int(v) for v in hidden]
+        return [128]
+
+    @staticmethod
+    def _extract_num_layers(cli_args, hidden_sizes):
+        for key in ("num_layers", "num_hidden_layers", "hidden_layers", "nhl"):
+            value = getattr(cli_args, key, None)
+            if value is not None:
+                return int(value)
+        if len(hidden_sizes) > 1:
+            return len(hidden_sizes)
+        return 1
+
+    @staticmethod
     def _resolve_hidden_sizes(hidden_size_arg, num_layers):
-        hidden_sizes = [int(v) for v in hidden_size_arg]
+        if isinstance(hidden_size_arg, (int, float)):
+            hidden_sizes = [int(hidden_size_arg)]
+        else:
+            hidden_sizes = [int(v) for v in hidden_size_arg]
         if num_layers < 1:
             raise ValueError("num_layers must be >= 1")
         if len(hidden_sizes) == 1 and num_layers > 1:

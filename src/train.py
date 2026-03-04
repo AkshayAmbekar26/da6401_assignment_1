@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import argparse
 import json
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 import numpy as np
@@ -98,7 +98,7 @@ def save_best_artifacts(model, args, final_metrics):
         "seed": args.seed,
         "wandb_project": args.wandb_project,
         "saved_model_path": str(model_path),
-        "saved_at": datetime.now(UTC).isoformat(),
+        "saved_at": datetime.now(timezone.utc).isoformat(),
         "metrics": final_metrics,
     }
 
