@@ -1,0 +1,42 @@
+{
+  "dataset": "mnist",
+  "epochs": 25,
+  "batch_size": 64,
+  "loss": "cross_entropy",
+  "optimizer": "rmsprop",
+  "learning_rate": 0.0005,
+  "weight_decay": 0.0,
+  "num_layers": 2,
+  "hidden_size": [
+    128,
+    128
+  ],
+  "activation": "tanh",
+  "weight_init": "random",
+  "seed": 42,
+  "wandb_project": "da6401_assignment_1",
+  "saved_model_path": "src/best_model.npy",
+  "saved_at": "2026-03-01T07:57:15.445116+00:00",
+  "metrics": {
+    "val": {
+      "loss": 0.11156388207999338,
+      "accuracy": 0.978,
+      "precision": 0.9778947394312981,
+      "recall": 0.9779025119838047,
+      "f1": 0.9778099461938966
+    },
+    "test": {
+      "loss": 0.11177501963632426,
+      "accuracy": 0.9772,
+      "precision": 0.9771690614692995,
+      "recall": 0.9769752127715463,
+      "f1": 0.9770389440981111
+    }
+  },
+  "selection": {
+    "policy": "highest_test_f1_among_top3_by_val_f1_from_sweep_slv9uapx",
+    "source_sweep_run_id": "ag1sxzim",
+    "source_sweep_run_name": "brisk-sweep-16",
+    "top3_retrained_epochs": 25
+  }
+}

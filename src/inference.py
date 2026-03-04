@@ -3,50 +3,74 @@ Inference Script
 Evaluate trained models on test sets
 """
 
+from __future__ import annotations
+
 import argparse
+from pathlib import Path
+
+import numpy as np
+
+from ann.neural_network import NeuralNetwork
+from utils.cli import add_common_arguments, validate_hidden_sizes
+from utils.data_loader import load_dataset
 
 def parse_arguments():
     """
     Parse command-line arguments for inference.
-    
-    TODO: Implement argparse with:
-    - model_path: Path to saved model weights(do not give absolute path, rather provide relative path)
-    - dataset: Dataset to evaluate on
-    - batch_size: Batch size for inference
-    - hidden_layers: List of hidden layer sizes
-    - num_neurons: Number of neurons in hidden layers
-    - activation: Activation function ('relu', 'sigmoid', 'tanh')
     """
     parser = argparse.ArgumentParser(description='Run inference on test set')
-    
-    return parser.parse_args()
+    add_common_arguments(parser)
+    args = parser.parse_args()
+    validate_hidden_sizes(args)
+    return args
 
 
 def load_model(model_path):
     """
     Load trained model from disk.
     """
-    pass
+    path = Path(model_path)
+    if not path.exists():
+        raise FileNotFoundError(f"Model file not found: {model_path}")
+    data = np.load(path, allow_pickle=True).item()
+    if not isinstance(data, dict):
+        raise ValueError("Model file must contain a pickled dictionary of weights.")
+    return data
 
 
-def evaluate_model(model, X_test, y_test): 
+def evaluate_model(model, X_test, y_test, batch_size): 
     """
     Evaluate model on test data.
-        
-    TODO: Return Dictionary - logits, loss, accuracy, f1, precision, recall
     """
-    pass
+    metrics = model.evaluate(X_test, y_test, batch_size=batch_size)
+    return {
+        "logits": metrics["logits"],
+        "loss": metrics["loss"],
+        "accuracy": metrics["accuracy"],
+        "precision": metrics["precision"],
+        "recall": metrics["recall"],
+        "f1": metrics["f1"],
+    }
 
 
 def main():
     """
     Main inference function.
-
-    TODO: Must return Dictionary - logits, loss, accuracy, f1, precision, recall
     """
     args = parse_arguments()
-    
+    data = load_dataset(dataset=args.dataset, seed=args.seed)
+    model = NeuralNetwork(args)
+    weights = load_model(args.model_path)
+    model.set_weights(weights)
+    metrics = evaluate_model(model, data["X_test"], data["y_test"], batch_size=args.batch_size)
+
     print("Evaluation complete!")
+    print(f"Accuracy:  {metrics['accuracy']:.4f}")
+    print(f"Precision: {metrics['precision']:.4f}")
+    print(f"Recall:    {metrics['recall']:.4f}")
+    print(f"F1-score:  {metrics['f1']:.4f}")
+    print(f"Loss:      {metrics['loss']:.4f}")
+    return metrics
 
 
 if __name__ == '__main__':
