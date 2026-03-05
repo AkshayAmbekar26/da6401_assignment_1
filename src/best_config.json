@@ -1,10 +1,10 @@
 {
   "dataset": "mnist",
-  "epochs": 12,
+  "epochs": 10,
   "batch_size": 64,
   "loss": "cross_entropy",
   "optimizer": "rmsprop",
-  "learning_rate": 0.00025,
+  "learning_rate": 0.0004,
   "weight_decay": 0.0001,
   "num_layers": 4,
   "hidden_size": [
@@ -18,27 +18,23 @@
   "seed": 42,
   "wandb_project": "da6401_assignment_1",
   "saved_model_path": "src/best_model.npy",
-  "saved_at": "2026-03-05T07:16:56.549861+00:00",
+  "saved_at": "2026-03-05T07:28:23.059009+00:00",
   "metrics": {
     "val": {
-      "accuracy": 0.9793,
-      "f1": 0.9793
+      "accuracy": 0.9848,
+      "f1": 0.9848
     },
     "test": {
-      "accuracy": 0.9792,
-      "f1": 0.979
+      "accuracy": 0.9848,
+      "f1": 0.9848
     }
   },
   "selection": {
-    "policy": "private_robust_search_v6",
-    "source": "src/tmp/private_robust_search_results_v6.json",
-    "candidate_name": "ft_v6_affine_strong",
+    "policy": "weight_average_v8",
+    "source": "src/tmp/avg_candidate_v8.npy",
+    "candidate_name": "0.48*ft_v4_rot25_balanced + 0.52*ft_v2_inv20_rot35_blur15",
     "summary": {
-      "clean_f1_no_tta": 0.9789881953631095,
-      "proxy_mean_f1_no_tta": 0.9530402957054672,
-      "proxy_min_f1_no_tta": 0.8888260232766327,
-      "proxy_low5_f1_no_tta": 0.9078023130131971,
-      "proxy_score_min_heavy": 0.9350766280741208
+      "proxy_score": 0.9396894924626261
     }
   }
 }
