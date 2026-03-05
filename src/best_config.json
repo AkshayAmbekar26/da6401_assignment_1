@@ -18,26 +18,26 @@
   "seed": 42,
   "wandb_project": "da6401_assignment_1",
   "saved_model_path": "src/best_model.npy",
-  "saved_at": "2026-03-04T18:11:37.800766+00:00",
+  "saved_at": "2026-03-05T06:00:29.563157+00:00",
   "metrics": {
     "val": {
-      "accuracy": 0.9876,
-      "f1": 0.9874
+      "accuracy": 0.9847,
+      "f1": 0.9846
     },
     "test": {
-      "accuracy": 0.9876,
-      "f1": 0.9875
+      "accuracy": 0.9847,
+      "f1": 0.9846
     }
   },
   "selection": {
-    "policy": "private_robust_search_v4_ensemble",
-    "source": "src/tmp/private_robust_search_results_v4.json",
-    "candidate_name": "ft_v4_rot25_balanced + ft_v4_rot20_long + ft_v3_long_balanced",
+    "policy": "weight_average_v1",
+    "source": "src/tmp/avg_candidate.npy",
+    "candidate_name": "average(ft_v4_rot25_balanced, ft_v2_inv20_rot35_blur15)",
     "summary": {
-      "clean_f1": 0.9874550860041913,
-      "mean_f1": 0.9410770228524925,
-      "min_f1": 0.7059738519821692,
-      "robust_score": 0.9016254231147862
+      "clean_f1_no_tta": 0.9846162513581428,
+      "proxy_mean_f1_no_tta": 0.9651001270776244,
+      "proxy_min_f1_no_tta": 0.9169503142499204,
+      "proxy_score_no_tta": 0.9618510721346134
     }
   }
 }
