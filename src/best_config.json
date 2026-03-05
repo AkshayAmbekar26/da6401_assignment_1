@@ -18,26 +18,26 @@
   "seed": 42,
   "wandb_project": "da6401_assignment_1",
   "saved_model_path": "src/best_model.npy",
-  "saved_at": "2026-03-05T06:00:29.563157+00:00",
+  "saved_at": "2026-03-05T06:30:38.930432+00:00",
   "metrics": {
     "val": {
-      "accuracy": 0.9847,
-      "f1": 0.9846
+      "accuracy": 0.9848,
+      "f1": 0.9848
     },
     "test": {
-      "accuracy": 0.9847,
-      "f1": 0.9846
+      "accuracy": 0.9848,
+      "f1": 0.9848
     }
   },
   "selection": {
-    "policy": "weight_average_v1",
-    "source": "src/tmp/avg_candidate.npy",
-    "candidate_name": "average(ft_v4_rot25_balanced, ft_v2_inv20_rot35_blur15)",
+    "policy": "weight_average_v3",
+    "source": "weighted_mix(ft_v4_rot25_balanced, ft_v2_inv20_rot35_blur15)",
+    "candidate_name": "0.60*ft_v4_rot25_balanced + 0.40*ft_v2_inv20_rot35_blur15",
     "summary": {
-      "clean_f1_no_tta": 0.9846162513581428,
-      "proxy_mean_f1_no_tta": 0.9651001270776244,
-      "proxy_min_f1_no_tta": 0.9169503142499204,
-      "proxy_score_no_tta": 0.9618510721346134
+      "clean_f1_no_tta": 0.9848185356756927,
+      "proxy_mean_f1_no_tta": 0.9619171026120136,
+      "proxy_min_f1_no_tta": 0.8550266551032537,
+      "proxy_score_min_heavy": 0.9023631207194935
     }
   }
 }
