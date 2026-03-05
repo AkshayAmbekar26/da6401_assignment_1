@@ -18,23 +18,25 @@
   "seed": 42,
   "wandb_project": "da6401_assignment_1",
   "saved_model_path": "src/best_model.npy",
-  "saved_at": "2026-03-05T07:28:23.059009+00:00",
+  "saved_at": "2026-03-05T07:50:08.769945+00:00",
   "metrics": {
     "val": {
-      "accuracy": 0.9848,
-      "f1": 0.9848
+      "accuracy": 0.9847,
+      "f1": 0.9847
     },
     "test": {
-      "accuracy": 0.9848,
-      "f1": 0.9848
+      "accuracy": 0.9847,
+      "f1": 0.9847
     }
   },
   "selection": {
-    "policy": "weight_average_v8",
-    "source": "src/tmp/avg_candidate_v8.npy",
-    "candidate_name": "0.48*ft_v4_rot25_balanced + 0.52*ft_v2_inv20_rot35_blur15",
+    "policy": "weight_average_v6_bias_tuned",
+    "source": "src/tmp/base796_bias_tuned_fast.npy",
+    "candidate_name": "0.60*ft_v4_rot25_balanced + 0.40*ft_v2_inv20_rot35_blur15 + tuned_output_bias",
     "summary": {
-      "proxy_score": 0.9396894924626261
+      "bias_delta": "[0.0942,-0.1502,-0.1225,0.0291,-0.0273,0.2319,-0.0184,0.1133,-0.1385,-0.0116]",
+      "proxy_score": 0.9419865220948475,
+      "proxy_B_min": 0.823554262130114
     }
   }
 }
