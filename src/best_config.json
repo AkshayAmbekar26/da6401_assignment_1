@@ -18,26 +18,28 @@
   "seed": 42,
   "wandb_project": "da6401_assignment_1",
   "saved_model_path": "src/best_model.npy",
-  "saved_at": "2026-03-05T06:30:38.930432+00:00",
+  "saved_at": "2026-03-05T06:54:22.420495+00:00",
   "metrics": {
     "val": {
-      "accuracy": 0.9848,
-      "f1": 0.9848
+      "accuracy": 0.985,
+      "f1": 0.985
     },
     "test": {
-      "accuracy": 0.9848,
-      "f1": 0.9848
+      "accuracy": 0.985,
+      "f1": 0.985
     }
   },
   "selection": {
-    "policy": "weight_average_v3",
-    "source": "weighted_mix(ft_v4_rot25_balanced, ft_v2_inv20_rot35_blur15)",
-    "candidate_name": "0.60*ft_v4_rot25_balanced + 0.40*ft_v2_inv20_rot35_blur15",
+    "policy": "weight_average_v5",
+    "source": "src/tmp/avg_candidate_v5.npy",
+    "candidate_name": "0.40*ft_v4_rot25_balanced + 0.20*ft_v4_rot20_long + 0.40*ft_v2_inv20_rot35_blur15",
     "summary": {
-      "clean_f1_no_tta": 0.9848185356756927,
-      "proxy_mean_f1_no_tta": 0.9619171026120136,
-      "proxy_min_f1_no_tta": 0.8550266551032537,
-      "proxy_score_min_heavy": 0.9023631207194935
+      "proxy_agg_full": 0.9560395939586405,
+      "clean_f1_no_tta": 0.9850049519267419,
+      "moderate_f1": 0.9781374483632873,
+      "hard_noise_inv_f1": 0.9768955574359965,
+      "rot_blur_hard_f1": 0.9027221708011826,
+      "geom_f1": 0.9242852692093269
     }
   }
 }
