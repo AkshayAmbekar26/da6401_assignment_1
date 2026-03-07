@@ -42,7 +42,7 @@ def evaluate_model(model, X_test, y_test, batch_size):
     """
     Evaluate model on test data.
     """
-    metrics = model.evaluate(X_test, y_test, batch_size=batch_size, use_tta=True)
+    metrics = model.evaluate(X_test, y_test, batch_size=batch_size)
     return {
         "logits": metrics["logits"],
         "loss": metrics["loss"],
