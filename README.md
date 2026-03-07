@@ -62,11 +62,11 @@ Both `train.py` and `inference.py` accept the same core arguments:
 Current defaults in `src/utils/cli.py`:
 
 - `dataset=mnist`
-- `epochs=20`
+- `epochs=10`
 - `batch_size=64`
 - `loss=cross_entropy`
 - `optimizer=rmsprop`
-- `learning_rate=0.0005`
+- `learning_rate=0.0004`
 - `weight_decay=0.0001`
 - `num_layers=4`
 - `hidden_size=128 128 128 128`
@@ -80,11 +80,11 @@ Example:
 ```bash
 python src/train.py \
   --dataset mnist \
-  --epochs 20 \
+  --epochs 10 \
   --batch_size 64 \
   --loss cross_entropy \
   --optimizer rmsprop \
-  --learning_rate 0.0005 \
+  --learning_rate 0.0004 \
   --weight_decay 0.0001 \
   --num_layers 4 \
   --hidden_size 128 128 128 128 \
@@ -106,7 +106,7 @@ python src/inference.py \
   --dataset mnist \
   --loss cross_entropy \
   --optimizer rmsprop \
-  --learning_rate 0.0005 \
+  --learning_rate 0.0004 \
   --weight_decay 0.0001 \
   --num_layers 4 \
   --hidden_size 128 128 128 128 \
