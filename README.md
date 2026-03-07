@@ -1,23 +1,33 @@
-# Assignment 1: NumPy MLP for MNIST/Fashion-MNIST
+# DA6401 Assignment 1: NumPy MLP
 
-NumPy-only implementation of a configurable Multi-Layer Perceptron for DA6401 Assignment 1.
+NumPy-only implementation of a configurable multi-layer perceptron for image classification on MNIST/Fashion-MNIST.
 
-## Submission Links
+## Links
 
-- GitHub Repository: [MiRL-IITM/da6401_assignment_1](https://github.com/AkshayAmbekar26/da6401_assignment_1)
-- W&B Report: [Report Link](https://wandb.ai/da25s007-/da6401_assignment_1/reports/DA6401-Assignment-01--VmlldzoxNjA3MDIwNg?accessToken=aaj9vs4xrpmqny2kh1hvflkt4fbnmz7vgqmcbxfkqedidc11vmu9juvtooczlh3j)
+- github repository: [AkshayAmbekar26/da6401_assignment_1](https://github.com/AkshayAmbekar26/da6401_assignment_1)
+- wandb report: [da6401 assignment 1 report](https://wandb.ai/da25s007-/da6401_assignment_1/reports/DA6401-Assignment-01--VmlldzoxNjA3MDIwNg?accessToken=aaj9vs4xrpmqny2kh1hvflkt4fbnmz7vgqmcbxfkqedidc11vmu9juvtooczlh3j)
 
-## Implemented Requirements (Part 1)
+## What Is Implemented
 
-- Configurable MLP with logits output (no output softmax in `forward`)
-- Hidden activations: `relu`, `sigmoid`, `tanh`
-- Losses from logits: `cross_entropy`, `mean_squared_error`
-- Optimizers: `sgd`, `momentum`, `nag`, `rmsprop`
-- Weight initialization: `random`, `xavier`, `zeros` (zeros used for symmetry experiment)
-- Shared CLI for `src/train.py` and `src/inference.py`
-- Layer-level gradients exposed as `layer.grad_W` and `layer.grad_b`
+- configurable MLP using only `numpy`
+- output of `forward()` is logits (no output softmax)
+- hidden activations: `sigmoid`, `tanh`, `relu`
+- losses: `cross_entropy`, `mean_squared_error` (alias: `mse`)
+- optimizers: `sgd`, `momentum`, `nag`, `rmsprop`
+- initializations: `random`, `xavier`, `zeros`
+- shared CLI for `src/train.py` and `src/inference.py`
+- per-layer gradients exposed as `layer.grad_W` and `layer.grad_b`
 - `NeuralNetwork.backward()` returns gradients from last layer to first
-- NumPy serialization with `get_weights()` and `set_weights()`
+
+## Repository Layout
+
+- `src/train.py`: training entry point
+- `src/inference.py`: model loading + test evaluation
+- `src/ann/`: model, layers, activations, losses, optimizers
+- `src/utils/cli.py`: shared argument parser
+- `src/utils/data_loader.py`: dataset loading + preprocessing
+- `src/best_model.npy`: submission model artifact
+- `src/best_config.json`: submission config artifact
 
 ## Setup
 
@@ -25,119 +35,120 @@ NumPy-only implementation of a configurable Multi-Layer Perceptron for DA6401 As
 pip install -r requirements.txt
 ```
 
-## Default Best Configuration
+## Shared CLI Arguments
 
-Current defaults in CLI are set to a strong MNIST configuration:
+Both `train.py` and `inference.py` accept the same core arguments:
 
-- `dataset=mnist`
-- `epochs=20`
-- `batch_size=64`
-- `loss=cross_entropy`
-- `optimizer=rmsprop`
-- `learning_rate=0.0004`
-- `weight_decay=0.0001`
-- `num_layers=4`
-- `hidden_size=128 128 128 128`
-- `activation=relu`
-- `weight_init=xavier`
-
-Submission artifacts (`src/best_model.npy`, `src/best_config.json`) store the selected best model for submission:
-`0.60 * ft_v4_rot25_balanced + 0.40 * ft_v2_inv20_rot35_blur15` (weight-averaged single model).
-
-- `src/best_model.npy`
-- `src/best_config.json`
-
-## CLI Arguments (Train and Inference)
-
-- `-d`, `-dataset`, `--dataset`: `mnist` | `fashion_mnist`
-- `-e`, `-epochs`, `--epochs`
-- `-b`, `-batch_size`, `--batch_size`
-- `-l`, `-loss`, `--loss`: `cross_entropy` | `mean_squared_error` (alias `mse` also accepted)
-- `-o`, `-optimizer`, `--optimizer`: `sgd` | `momentum` | `nag` | `rmsprop`
-- `-lr`, `-learning_rate`, `--learning_rate`
-- `-wd`, `--weight_decay`
-- `-nhl`, `--num_layers`
-- `-sz`, `--hidden_size` (space-separated list)
-- `-a`, `--activation`: `sigmoid` | `tanh` | `relu`
-- `-w_i`, `--weight_init`: `random` | `xavier` | `zeros`
-- `-w_p`, `--wandb_project`
+- `-d, --dataset`: `mnist` | `fashion_mnist`
+- `-e, --epochs`: number of epochs
+- `-b, --batch_size`
+- `-l, --loss`: `cross_entropy` | `mean_squared_error` | `mse`
+- `-o, --optimizer`: `sgd` | `momentum` | `nag` | `rmsprop`
+- `-lr, --learning_rate`
+- `-wd, --weight_decay`
+- `-nhl, --num_layers`
+- `-sz, --hidden_size`: one value or exactly `num_layers` values
+- `-a, --activation`: `sigmoid` | `tanh` | `relu`
+- `-w_i, --weight_init`: `random` | `xavier` | `zeros`
+- `-w_p, --wandb_project`
 - `--wandb_entity`
 - `--wandb_mode`: `online` | `offline` | `disabled`
 - `--seed`
 - `--model_path`
 - `--config_path`
 
-## Train
+## Default CLI Configuration
+
+Current defaults in `src/utils/cli.py`:
+
+- `dataset=mnist`
+- `epochs=20`
+- `batch_size=64`
+- `loss=cross_entropy`
+- `optimizer=rmsprop`
+- `learning_rate=0.0005`
+- `weight_decay=0.0001`
+- `num_layers=4`
+- `hidden_size=128 128 128 128`
+- `activation=relu`
+- `weight_init=xavier`
+
+## Training
+
+Example:
 
 ```bash
 python src/train.py \
-  -d mnist \
-  -e 20 \
-  -b 64 \
-  -l cross_entropy \
-  -o rmsprop \
-  -lr 0.0004 \
-  -wd 0.0001 \
-  -nhl 4 \
-  -sz 128 128 128 128 \
-  -a relu \
-  -w_i xavier \
-  -w_p da6401_assignment_1
+  --dataset mnist \
+  --epochs 20 \
+  --batch_size 64 \
+  --loss cross_entropy \
+  --optimizer rmsprop \
+  --learning_rate 0.0005 \
+  --weight_decay 0.0001 \
+  --num_layers 4 \
+  --hidden_size 128 128 128 128 \
+  --activation relu \
+  --weight_init xavier \
+  --wandb_mode disabled
 ```
 
-To run without W&B logging:
+Outputs:
 
-```bash
-python src/train.py --wandb_mode disabled
-```
+- prints final validation/test metrics
+- saves model weights (`.npy`) and config (`.json`)
+- by default writes to `src/best_model.npy` and `src/best_config.json`
 
 ## Inference
 
 ```bash
 python src/inference.py \
-  -d mnist \
-  -l cross_entropy \
-  -o rmsprop \
-  -lr 0.0004 \
-  -wd 0.0001 \
-  -nhl 4 \
-  -sz 128 128 128 128 \
-  -a relu \
-  -w_i xavier \
-  --model_path src/best_model.npy
+  --dataset mnist \
+  --loss cross_entropy \
+  --optimizer rmsprop \
+  --learning_rate 0.0005 \
+  --weight_decay 0.0001 \
+  --num_layers 4 \
+  --hidden_size 128 128 128 128 \
+  --activation relu \
+  --weight_init xavier \
+  --model_path src/best_model.npy \
+  --wandb_mode disabled
 ```
 
-Outputs: Accuracy, Precision, Recall, F1-score, and Loss.
+Printed metrics:
 
-## Numerical Gradient Check
+- accuracy
+- precision (macro)
+- recall (macro)
+- f1-score (macro)
+- loss
+
+## Submission Artifacts
+
+Final submission files:
+
+- `src/best_model.npy`
+- `src/best_config.json`
+
+Current selected model in these artifacts:
+
+- `0.60 * ft_v4_rot25_balanced + 0.40 * ft_v2_inv20_rot35_blur15` (single averaged weight set)
+
+## Gradient Check
 
 ```bash
 python src/gradient_check.py
 ```
 
-This script performs finite-difference checks and reports max relative error.
+Expected behavior:
 
-## W&B Sweep (100 Runs)
+- finite-difference gradient check passes with very low relative error
 
-Notebook workflow:
+## Autograder Alignment Notes
 
-- Open `notebooks/report_2_2_hyperparameter_sweep.ipynb`
-- Set `RUN_SWEEP = True`
-- Run all cells to create and launch the sweep agent
-
-Default sweep search space file:
-
-- `src/wandb_sweep_config.yaml`
-
-## Report/Experiment Notebooks
-
-- `notebooks/report_2_1_data_exploration.ipynb`
-- `notebooks/report_2_2_hyperparameter_sweep.ipynb`
-- `notebooks/report_2_3_optimizer_showdown.ipynb`
-- `notebooks/report_2_4_vanishing_gradient.ipynb`
-- `notebooks/report_2_5_dead_neuron.ipynb`
-- `notebooks/report_2_6_loss_comparison.ipynb`
-- `notebooks/report_2_7_global_performance.ipynb`
-- `notebooks/report_2_8_error_analysis.ipynb`
-- `notebooks/report_2_9_weight_init_symmetry.ipynb`
-- `notebooks/report_2_10_fashion_transfer.ipynb`
+- no torch/tensorflow/jax or autograd used in the model math
+- `forward()` returns logits only
+- per-layer `grad_W` and `grad_b` are available after `backward()`
+- backward gradient order is output-layer to input-layer
+- both training and inference use argparse-based CLI
