@@ -4,9 +4,8 @@ NumPy-only implementation of a configurable Multi-Layer Perceptron for DA6401 As
 
 ## Submission Links
 
-- GitHub Repository: [MiRL-IITM/da6401_assignment_1](https://github.com/MiRL-IITM/da6401_assignment_1) (replace with your fork URL if required by submission)
-- W&B Project: [da6401_assignment_1](https://wandb.ai/da25s007-/da6401_assignment_1)
-- W&B Report: `ADD_PUBLIC_WANDB_REPORT_LINK_HERE` (replace before final submission)
+- GitHub Repository: [MiRL-IITM/da6401_assignment_1](https://github.com/AkshayAmbekar26/da6401_assignment_1)
+- W&B Report: [Report Link](https://wandb.ai/da25s007-/da6401_assignment_1/reports/DA6401-Assignment-01--VmlldzoxNjA3MDIwNg?accessToken=aaj9vs4xrpmqny2kh1hvflkt4fbnmz7vgqmcbxfkqedidc11vmu9juvtooczlh3j)
 
 ## Implemented Requirements (Part 1)
 
@@ -142,9 +141,3 @@ Default sweep search space file:
 - `notebooks/report_2_8_error_analysis.ipynb`
 - `notebooks/report_2_9_weight_init_symmetry.ipynb`
 - `notebooks/report_2_10_fashion_transfer.ipynb`
-
-## Notes
-
-- `sgd` is implemented as mini-batch gradient descent updates over batches.
-- `best_config.json` stores hyperparameters, seed, timestamp, and final validation/test metrics.
-- Replace `ADD_PUBLIC_WANDB_REPORT_LINK_HERE` with your public W&B report URL before final submission.
