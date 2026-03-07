@@ -28,21 +28,22 @@ pip install -r requirements.txt
 
 ## Default Best Configuration
 
-Current defaults in CLI and artifacts match the selected MNIST best configuration:
+Current defaults in CLI are set to a strong MNIST configuration:
 
 - `dataset=mnist`
-- `epochs=25`
+- `epochs=20`
 - `batch_size=64`
 - `loss=cross_entropy`
 - `optimizer=rmsprop`
-- `learning_rate=0.0005`
-- `weight_decay=0.0`
-- `num_layers=2`
-- `hidden_size=128 128`
-- `activation=tanh`
-- `weight_init=random`
+- `learning_rate=0.0004`
+- `weight_decay=0.0001`
+- `num_layers=4`
+- `hidden_size=128 128 128 128`
+- `activation=relu`
+- `weight_init=xavier`
 
-Submission artifacts:
+Submission artifacts (`src/best_model.npy`, `src/best_config.json`) store the selected best model for submission:
+`0.60 * ft_v4_rot25_balanced + 0.40 * ft_v2_inv20_rot35_blur15` (weight-averaged single model).
 
 - `src/best_model.npy`
 - `src/best_config.json`
@@ -72,16 +73,16 @@ Submission artifacts:
 ```bash
 python src/train.py \
   -d mnist \
-  -e 25 \
+  -e 20 \
   -b 64 \
   -l cross_entropy \
   -o rmsprop \
-  -lr 0.0005 \
-  -wd 0.0 \
-  -nhl 2 \
-  -sz 128 128 \
-  -a tanh \
-  -w_i random \
+  -lr 0.0004 \
+  -wd 0.0001 \
+  -nhl 4 \
+  -sz 128 128 128 128 \
+  -a relu \
+  -w_i xavier \
   -w_p da6401_assignment_1
 ```
 
@@ -98,12 +99,12 @@ python src/inference.py \
   -d mnist \
   -l cross_entropy \
   -o rmsprop \
-  -lr 0.0005 \
-  -wd 0.0 \
-  -nhl 2 \
-  -sz 128 128 \
-  -a tanh \
-  -w_i random \
+  -lr 0.0004 \
+  -wd 0.0001 \
+  -nhl 4 \
+  -sz 128 128 128 128 \
+  -a relu \
+  -w_i xavier \
   --model_path src/best_model.npy
 ```
 
