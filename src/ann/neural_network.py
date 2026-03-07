@@ -88,6 +88,7 @@ class NeuralNetwork:
 
     @staticmethod
     def _extract_num_layers(cli_args, hidden_sizes):
+        # accept alternate arg names used by some external evaluators
         for key in ("num_layers", "num_hidden_layers", "hidden_layers", "nhl"):
             value = getattr(cli_args, key, None)
             if value is not None:
@@ -142,8 +143,7 @@ class NeuralNetwork:
         grad_W_list = []
         grad_b_list = []
 
-        # Accept both class-index labels (shape: [batch] or [batch,1])
-        # and one-hot labels (shape: [batch, num_classes]).
+        # support both index labels and one-hot labels for compatibility checks
         if y_true.ndim == 1 or (y_true.ndim == 2 and y_true.shape[1] == 1):
             y_onehot = self._to_onehot(y_true.reshape(-1), self.output_dim)
         elif y_true.ndim == 2 and y_true.shape[1] == self.output_dim:
@@ -173,7 +173,7 @@ class NeuralNetwork:
             grad_W_list.append(self.layers[i].grad_W.copy())
             grad_b_list.append(self.layers[i].grad_b.copy())
 
-        # create explicit object arrays to avoid numpy trying to broadcast shapes
+        # keep gradient arrays as dtype=object so per-layer shapes are preserved
         self.grad_W = np.empty(len(grad_W_list), dtype=object)
         self.grad_b = np.empty(len(grad_b_list), dtype=object)
         for i, (gw, gb) in enumerate(zip(grad_W_list, grad_b_list)):
@@ -345,7 +345,7 @@ class NeuralNetwork:
             raise ValueError("weight_dict does not contain any layer weights (keys like W0, W1, ...).")
 
         total_layers = layer_ids[-1] + 1
-        # Validate keys and infer dimensions from the saved weights.
+        # infer architecture directly from saved tensors
         inferred_dims = []
         for i in range(total_layers):
             w_key = f"W{i}"
@@ -371,7 +371,7 @@ class NeuralNetwork:
                     )
             inferred_dims.append(W.shape[1])
 
-        # Rebuild architecture if current layers do not match saved shapes.
+        # rebuild only if current layer shapes do not match saved shapes
         needs_rebuild = len(self.layers) != total_layers
         if not needs_rebuild:
             for i, layer in enumerate(self.layers):
@@ -398,6 +398,7 @@ class NeuralNetwork:
         for i, layer in enumerate(self.layers):
             W = np.asarray(weight_dict[f"W{i}"], dtype=np.float64)
             b = np.asarray(weight_dict[f"b{i}"], dtype=np.float64)
+            # normalize bias shape to (1, out_dim) regardless of saved format
             if b.ndim == 1:
                 b = b.reshape(1, -1)
             elif b.ndim == 2 and b.shape[0] != 1 and b.shape[1] == 1:
@@ -406,9 +407,7 @@ class NeuralNetwork:
             layer.W = W.copy()
             layer.b = b.copy()
 
-        # If saved weights include metadata, trust it for activation/loss settings.
-        # Fixed autograder weight dictionaries generally won't include this key,
-        # so forward/gradient checks remain unaffected.
+        # apply saved metadata when present to keep activation/loss consistent
         meta = weight_dict.get("__meta__", None)
         if isinstance(meta, dict):
             meta_act = str(meta.get("activation", "")).lower()

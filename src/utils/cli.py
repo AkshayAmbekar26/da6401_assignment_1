@@ -38,6 +38,7 @@ def validate_hidden_sizes(args) -> None:
     if args.num_layers < 1:
         raise ValueError("--num_layers must be >= 1")
 
+    # allow passing a single width and expand it across all hidden layers
     if len(args.hidden_size) == 1 and args.num_layers > 1:
         args.hidden_size = args.hidden_size * args.num_layers
         return

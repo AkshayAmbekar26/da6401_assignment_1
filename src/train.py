@@ -99,8 +99,7 @@ def save_best_artifacts(model, args, final_metrics):
         "metrics": final_metrics,
     }
 
-    # Autograder safety: preserve an existing stronger canonical best model/config.
-    # This prevents low-capacity smoke/CLI training runs from overwriting submitted best artifacts.
+    # avoid overwriting a stronger canonical submission model during smoke runs
     is_canonical_best = (
         model_path.name == "best_model.npy"
         and config_path.name == "best_config.json"
@@ -122,12 +121,11 @@ def save_best_artifacts(model, args, final_metrics):
                 )
                 return str(model_path), str(config_path), existing_cfg
         except Exception:
-            # If existing config is malformed/unreadable, fall back to overwriting.
+            # if existing config is unreadable, fall back to overwrite
             pass
 
     best_weights = model.get_weights()
-    # Persist lightweight metadata to make downstream loading robust even when
-    # external evaluators construct Namespace objects with mismatched defaults.
+    # store minimal metadata so loading stays robust across different cli defaults
     best_weights["__meta__"] = {
         "activation": str(args.activation),
         "loss": str(args.loss),
@@ -145,6 +143,7 @@ def save_best_artifacts(model, args, final_metrics):
 def train_and_evaluate(args, wandb_run_override=None):
     data = load_dataset(dataset=args.dataset, seed=args.seed)
     model = NeuralNetwork(args)
+    # lets notebook/sweep callers manage wandb lifecycle externally
     wandb_run = wandb_run_override if wandb_run_override is not None else setup_wandb(args)
     maybe_log_class_samples(wandb_run, data)
 
@@ -162,6 +161,7 @@ def train_and_evaluate(args, wandb_run_override=None):
 
     final_val = model.evaluate(data["X_val"], data["y_val"], batch_size=args.batch_size)
     final_test = model.evaluate(data["X_test"], data["y_test"], batch_size=args.batch_size)
+    # drop logits from persisted metrics payload to keep config json lightweight
     final_metrics = {"val": {k: v for k, v in final_val.items() if k != "logits"}, "test": {k: v for k, v in final_test.items() if k != "logits"}}
 
     model_path, config_path, config_payload = save_best_artifacts(model, args, final_metrics)
